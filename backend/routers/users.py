@@ -12,6 +12,8 @@ router = APIRouter()
 
 @router.get('/me')
 async def get_me(user_service: UserService = Depends(get_user_service), 
+                 child_service: ChildService = Depends(get_child_service),
+                 order_service: OrderService = Depends(get_order_service),
                  current_user = Depends(get_current_user)):
     user = user_service.get_user_filter_by(id=current_user.id)
     if not user:
@@ -19,9 +21,18 @@ async def get_me(user_service: UserService = Depends(get_user_service),
     user_resp = UserResponse(**user.__dict__)
     if user.role == Roles.USER.value:
         parent = user_service.get_one_parent_filter_by(id_user=user.id)
+
+        childs = child_service.get_all_childs_filter_by(id_parent=parent.id)
+        childs_resp = [ShortChildResponse(**child.__dict__).model_dump() for child in childs]
+
+        orders = order_service.get_all_orders_filter_by(id_parent=parent.id)
+        orders_resp = [ShortOrderResponse(**order.__dict__).model_dump() for order in orders]
+
         parent_dict = parent.__dict__
         parent_dict.update({
-            'user': user_resp
+            'user': user_resp,
+            'childs': childs_resp,
+            'orders': orders_resp
         })
         parent_resp = ParentResponse(**parent_dict)
         return parent_resp

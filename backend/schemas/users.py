@@ -2,7 +2,31 @@ from pydantic import BaseModel, Field, field_validator, EmailStr
 import re
 from typing import Optional, List
 from datetime import date
-from utils.enums import Roles
+from utils.enums import *
+
+class ShortChildResponse(BaseModel):
+    id: int
+    name: str
+    birth_date: date
+    gender: GenderType
+    height: float
+    weight: float
+    blood: BloodType
+    disability: str
+    vaccinations: str
+    medical_note: str
+
+
+class ShortOrderResponse(BaseModel):
+    id: int
+    id_child: int
+    id_treatment_course: int
+    id_room: int
+    status: OrderStatus
+    check_in_date: date
+    check_out_date: date
+    price: float
+
 
 class UserCreate(BaseModel):
     role: str

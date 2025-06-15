@@ -26,7 +26,13 @@ class ShortChildResponse(BaseModel):
     id: int
     name: str
     birth_date: date
-    gender: str
+    gender: GenderType
+    height: float
+    weight: float
+    blood: BloodType
+    disability: str
+    vaccinations: str
+    medical_note: str
 
 class ChildResponse(BaseModel): 
     id: int

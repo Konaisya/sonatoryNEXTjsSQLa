@@ -52,11 +52,7 @@ async def signup(new_user: UserStaffCreate,
     staff = user_service.create_staff(CreateModelStaff(**staff_dict))
     if not staff:
         raise HTTPException(status_code=400, detail={'status': Status.FAILED.value})
-    
-    token, update_token = auth_service.login(UserLogin(email=user_email, password=user_password))
-    response = JSONResponse(content=token)
-    response.set_cookie(key='update_token', value=update_token, httponly=True, max_age=60*60*24*7)
-    return response
+    return {'status': Status.SUCCESS.value}
 
 @router.post('/login', status_code=200)
 async def login(email: EmailStr = Form(...), password = Form(...), auth_service: AuthService = Depends(get_auth_service)):

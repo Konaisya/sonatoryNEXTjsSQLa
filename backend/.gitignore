@@ -1,4 +1,5 @@
 /.env
 /create_db.py
 */__pycache__/
-
+/venv/
+/__pycache__/

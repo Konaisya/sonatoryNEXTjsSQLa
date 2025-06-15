@@ -15,7 +15,7 @@ async def create_order(data: CreateOrder,
                        order_service: OrderService = Depends(get_order_service),
                        user_service: UserService = Depends(get_user_service),
                        course_service: CourseService = Depends(get_course_service),
-                       current_user: User = Depends(get_user_service),
+                       current_user: User = Depends(get_current_user),
                        ):
     data_dict = data.model_dump()
 
@@ -47,7 +47,7 @@ async def get_all_orders(id_child: int = Query(None),
                          course_service: CourseService = Depends(get_course_service),
                          child_service: ChildService = Depends(get_child_service),
                          room_service: RoomService = Depends(get_room_service),
-                         current_user: User = Depends(get_user_service),
+                         current_user: User = Depends(get_current_user),
                         ):
     if current_user.role == Roles.ADMIN.value:
         filter = {k: v for k, v in locals().items() if v is not None 
@@ -93,7 +93,7 @@ async def get_one_order(id: int,
                         course_service: CourseService = Depends(get_course_service),
                         child_service: ChildService = Depends(get_child_service),
                         room_service: RoomService = Depends(get_room_service),
-                        current_user: User = Depends(get_user_service),
+                        current_user: User = Depends(get_current_user),
                         ):
     order = order_service.get_one_order_filter_by(id=id)
     if not orders:
@@ -125,7 +125,7 @@ async def update_order(id: int,
                        data: UpdateOrder,
                        order_service: OrderService = Depends(get_order_service),
                        course_service: CourseService = Depends(get_course_service),
-                       current_user: User = Depends(get_user_service),
+                       current_user: User = Depends(get_current_user),
                        ):
     order = order_service.get_one_order_filter_by(id=id)
     if not order:
@@ -134,7 +134,10 @@ async def update_order(id: int,
     data_dict = data.model_dump()
     if 'id_treatment_course' in data_dict:
         course = course_service.get_one_course_filter_by(id=data_dict['id_treatment_course'])
-        data_dict['price'] = course.price
+        if course and hasattr(course, "price"):
+            data_dict['price'] = course.price
+        else:
+            data_dict['price'] = None
 
     updated_order = order_service.update_order(id, data_dict)
     return updated_order
@@ -142,7 +145,7 @@ async def update_order(id: int,
 @router.delete('/{id}', status_code=200)
 async def delete_order(id: int,
                        order_service: OrderService = Depends(get_order_service),
-                       current_user: User = Depends(get_user_service),
+                       current_user: User = Depends(get_current_user),
                        ):
     order = order_service.get_one_order_filter_by(id=id)
     if not order:
