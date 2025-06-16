@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, X, ChevronLeft, ChevronRight, Edit, Trash2 } from 'lucide-react'
 import axios from 'axios'
+import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
 
 interface Child {
   id: number
@@ -75,7 +77,24 @@ export default function OrdersPage() {
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const ordersPerPage = 8
-
+  const { token } = useAuth();
+  const router = useRouter();
+  
+    useEffect(() => {
+      if (!token) {
+        router.replace("/auth");
+        return;
+      }
+      try {
+        const payload = token.split('.')[1];
+        const decoded = JSON.parse(atob(payload));
+        if (decoded.role !== "ADMIN") {
+          router.replace("/profile");
+        }
+      } catch {
+        router.replace("/auth");
+      }
+    }, [token, router]);
   useEffect(() => {
     const fetchOrders = async () => {
       try {

@@ -42,7 +42,6 @@ export default function AuthPage() {
     e.preventDefault();
     await signin(loginForm);
     setSuccess(true);
-    // Получаем токен из localStorage (или из useAuth, если возвращается)
     const token = localStorage.getItem("token");
     if (token) {
       const role = getRoleFromToken(token);

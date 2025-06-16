@@ -2,6 +2,9 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ClipboardList, Stethoscope, BookOpenCheck, BedDouble, UserPlus, NotebookPen, FileText, LayoutDashboard } from "lucide-react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 const adminLinks = [
   {
@@ -56,6 +59,25 @@ const adminLinks = [
 ];
 
 export default function AdminDashboardPage() {
+  const { token } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!token) {
+      router.replace("/auth");
+      return;
+    }
+    try {
+      const payload = token.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      if (decoded.role !== "ADMIN") {
+        router.replace("/profile");
+      }
+    } catch {
+      router.replace("/auth");
+    }
+  }, [token, router]);
+
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto">
       <motion.div

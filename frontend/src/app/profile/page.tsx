@@ -1,7 +1,8 @@
 "use client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
-import { Baby, Calendar, Scale, Droplet, Plus, User, Phone, Home, CreditCard, ClipboardList, Bed, ChevronDown, ChevronUp, BriefcaseMedical, NotebookText, Edit, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Baby, Calendar, Scale,  Plus,  Phone, Home, CreditCard, ClipboardList, Bed, ChevronDown, ChevronUp, BriefcaseMedical, NotebookText, Edit, Search } from "lucide-react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -110,6 +111,7 @@ const bloodTypeOptions = [
 
 export default function ProfilePage() {
   const { user, token } = useAuth();
+  const router = useRouter();
   const [profile, setProfile] = useState<ParentResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -142,7 +144,10 @@ export default function ProfilePage() {
   const [cardLoading, setCardLoading] = useState(false);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      router.replace("/auth");
+      return;
+    }
     fetchProfile();
     fetchDiagnoses();
   }, [token, searchTerm]);

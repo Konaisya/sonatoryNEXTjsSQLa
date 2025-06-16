@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Search, X, Edit, Trash2, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react'
 import axios from 'axios'
+import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
 
 interface Procedure {
   id: number
@@ -59,6 +61,24 @@ export default function CoursesPage() {
     ids_procedures: []
   })
   const coursesPerPage = 8
+    const { token } = useAuth();
+    const router = useRouter();
+    
+      useEffect(() => {
+        if (!token) {
+          router.replace("/auth");
+          return;
+        }
+        try {
+          const payload = token.split('.')[1];
+          const decoded = JSON.parse(atob(payload));
+          if (decoded.role !== "ADMIN") {
+            router.replace("/profile");
+          }
+        } catch {
+          router.replace("/auth");
+        }
+      }, [token, router]);
 
   useEffect(() => {
     const fetchData = async () => {

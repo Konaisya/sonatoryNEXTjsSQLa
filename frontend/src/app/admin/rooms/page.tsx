@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Search, X, Edit, Trash2, ChevronLeft, ChevronRight, DoorOpen } from 'lucide-react'
 import axios from 'axios'
+import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
 
 interface Room {
   id: number
@@ -27,6 +29,25 @@ export default function RoomsPage() {
     description: ''
   })
   const roomsPerPage = 8
+
+  const { token } = useAuth();
+  const router = useRouter();
+  
+    useEffect(() => {
+      if (!token) {
+        router.replace("/auth");
+        return;
+      }
+      try {
+        const payload = token.split('.')[1];
+        const decoded = JSON.parse(atob(payload));
+        if (decoded.role !== "ADMIN") {
+          router.replace("/profile");
+        }
+      } catch {
+        router.replace("/auth");
+      }
+    }, [token, router]);
 
   useEffect(() => {
     const fetchRooms = async () => {
